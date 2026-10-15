@@ -1,6 +1,6 @@
 /**
  * Lightweight i18n for static Optimus CA site (UZ Latin / RU).
- * Default: uz. Switcher: Uzbekistan + Russia flag buttons.
+ * Default: uz. Switcher: compact UZ/RU dropdown in header actions.
  */
 (function (window, document) {
   'use strict';
@@ -34,13 +34,25 @@
     '<rect width="36" height="8" y="16" fill="#D52B1E"/>' +
     '</svg>';
 
+  var CHEVRON =
+    '<svg class="lang-dd-chevron" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">' +
+    '<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>' +
+    '</svg>';
+
   var SWITCHER_HTML =
-    '<button type="button" data-lang-switch="uz" class="lang-flag-btn" title="O‘zbekcha" aria-label="O‘zbek tili">' +
-      FLAG_UZ +
+    '<button type="button" class="lang-dd-toggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Til / Язык">' +
+      '<span class="lang-dd-flag" data-lang-current-flag>' + FLAG_UZ + '</span>' +
+      '<span class="lang-dd-code" data-lang-current-code>UZ</span>' +
+      CHEVRON +
     '</button>' +
-    '<button type="button" data-lang-switch="ru" class="lang-flag-btn" title="Русский" aria-label="Русский язык">' +
-      FLAG_RU +
-    '</button>';
+    '<div class="lang-dd-menu" role="listbox" hidden>' +
+      '<button type="button" role="option" data-lang-switch="uz" class="lang-dd-option" title="O‘zbekcha" aria-label="O‘zbek tili">' +
+        FLAG_UZ + '<span>O‘zbekcha</span>' +
+      '</button>' +
+      '<button type="button" role="option" data-lang-switch="ru" class="lang-dd-option" title="Русский" aria-label="Русский язык">' +
+        FLAG_RU + '<span>Русский</span>' +
+      '</button>' +
+    '</div>';
 
   function detectLang() {
     try {
@@ -170,47 +182,95 @@
     if (modalClose) modalClose.textContent = window.LEAD_THANKS.button;
   }
 
+  function setDropdownOpen(open) {
+    var root = document.getElementById('lang-switcher');
+    if (!root) return;
+    var toggle = root.querySelector('.lang-dd-toggle');
+    var menu = root.querySelector('.lang-dd-menu');
+    if (!toggle || !menu) return;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) menu.removeAttribute('hidden');
+    else menu.setAttribute('hidden', '');
+    root.classList.toggle('is-open', !!open);
+  }
+
   function updateSwitcherUI() {
     document.querySelectorAll('[data-lang-switch]').forEach(function (btn) {
       var lang = btn.getAttribute('data-lang-switch');
       var active = lang === current;
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
       btn.classList.toggle('is-active', active);
     });
+    var flagHost = document.querySelector('[data-lang-current-flag]');
+    var codeHost = document.querySelector('[data-lang-current-code]');
+    if (flagHost) flagHost.innerHTML = current === 'uz' ? FLAG_UZ : FLAG_RU;
+    if (codeHost) codeHost.textContent = current === 'uz' ? 'UZ' : 'RU';
     try {
       document.documentElement.lang = current === 'uz' ? 'uz' : 'ru';
       document.documentElement.setAttribute('data-lang', current);
     } catch (e) { /* ignore */ }
+    setDropdownOpen(false);
+  }
+
+  function mountSwitcher(el) {
+    var actions = document.querySelector('#site-header .header-actions');
+    var bar = document.querySelector('#site-header .header-bar');
+
+    if (actions) {
+      var phone = actions.querySelector('.header-phone, a[href^="tel:"]');
+      var toggle = actions.querySelector('#nav-toggle');
+      if (phone) {
+        actions.insertBefore(el, phone);
+      } else if (toggle && toggle.nextSibling) {
+        actions.insertBefore(el, toggle.nextSibling);
+      } else if (toggle) {
+        actions.appendChild(el);
+      } else {
+        actions.insertBefore(el, actions.firstChild);
+      }
+      return;
+    }
+
+    if (bar) {
+      var cta = null;
+      var kids = bar.children;
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i].classList && kids[i].classList.contains('btn-cta')) cta = kids[i];
+        else if (kids[i].matches && kids[i].matches('a.btn-cta')) cta = kids[i];
+      }
+      if (!cta) cta = bar.querySelector(':scope > .btn-cta, :scope > a.btn-cta');
+      if (cta) bar.insertBefore(el, cta);
+      else bar.appendChild(el);
+      return;
+    }
+
+    var header = document.querySelector('#site-header') || document.querySelector('header') || document.body;
+    if (header) header.appendChild(el);
   }
 
   function ensureSwitcher() {
     var existing = document.getElementById('lang-switcher');
     if (existing) {
-      if (!existing.querySelector('[data-lang-switch]')) {
+      if (!existing.querySelector('.lang-dd-toggle') || !existing.querySelector('[data-lang-switch]')) {
         existing.innerHTML = SWITCHER_HTML;
       }
-      // Keep flags glued to brand block (never under logo on wrap)
-      var brand = document.querySelector('#site-header .header-brand');
-      if (brand && existing.parentElement !== brand) {
-        brand.appendChild(existing);
-      }
+      existing.className = 'lang-switcher';
+      existing.setAttribute('role', 'group');
+      existing.setAttribute('aria-label', 'Til / Язык');
+      existing.setAttribute('data-i18n-skip', 'true');
+      mountSwitcher(existing);
       return;
     }
-    var brandHost = document.querySelector('#site-header .header-brand');
-    var host =
-      brandHost ||
-      document.querySelector('#site-header .header-actions') ||
-      document.querySelector('#site-header') ||
-      document.querySelector('header') ||
-      document.body;
-    if (!host) return;
+
     var wrap = document.createElement('div');
     wrap.id = 'lang-switcher';
     wrap.className = 'lang-switcher';
     wrap.setAttribute('role', 'group');
     wrap.setAttribute('aria-label', 'Til / Язык');
+    wrap.setAttribute('data-i18n-skip', 'true');
     wrap.innerHTML = SWITCHER_HTML;
-    host.appendChild(wrap);
+    mountSwitcher(wrap);
   }
 
   function apply(dict) {
@@ -278,8 +338,31 @@
     });
   }
 
+  function bootLangDropdown() {
+    var root = document.getElementById('lang-switcher');
+    if (!root) return;
+    var toggle = root.querySelector('.lang-dd-toggle');
+    if (!toggle) return;
+
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var open = toggle.getAttribute('aria-expanded') === 'true';
+      setDropdownOpen(!open);
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!root.contains(e.target)) setDropdownOpen(false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setDropdownOpen(false);
+    });
+  }
+
   function boot() {
     ensureSwitcher();
+    bootLangDropdown();
     bootMobileNav();
     var lang = detectLang();
     setLanguage(lang, { reload: false }).then(function () {
@@ -289,7 +372,10 @@
       var btn = e.target.closest && e.target.closest('[data-lang-switch]');
       if (!btn) return;
       var lang2 = btn.getAttribute('data-lang-switch');
-      if (!lang2 || lang2 === current) return;
+      if (!lang2 || lang2 === current) {
+        setDropdownOpen(false);
+        return;
+      }
       setLanguage(lang2, { reload: true });
     });
   }

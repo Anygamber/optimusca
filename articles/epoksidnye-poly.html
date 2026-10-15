@@ -26,7 +26,7 @@
   <script src="/js/data-layer.js?v=20261015_gtm"></script>
   <script src="/js/google-ads.js?v=20261015_gtm" onerror="console.error('[google-ads] FAILED to load', this.src)"></script>
   <script src="/js/lead-api.js?v=20261014_thanks" onerror="console.error('[lead-api] FAILED to load', this.src)"></script>
-  <script src="../js/i18n.js?v=20261015_ux" defer></script>
+  <script src="../js/i18n.js?v=20261015_header" defer></script>
   <title>Какой грунт выбрать под эпоксидные полы на производстве и складах</title>
   <meta name="description" content="Как выбрать грунтовку под эпоксидные полы: бетон, влажность, нагрузка. Советы инженеров MCHJ OPTIMUS CA для складов и производств в Узбекистане.">
   <meta name="robots" content="index, follow">
@@ -87,7 +87,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../css/site-ux.css?v=20261015_ux">
+  <link rel="stylesheet" href="../css/site-ux.css?v=20261015_header">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -203,10 +203,7 @@
         <a href="../blog.html" class="text-red-600">Блог</a>
         <a href="../industrial.html" class="transition-colors hover:text-red-600">Промышленные</a>
       </nav>
-      <div id="lang-switcher" class="lang-switcher" role="group" aria-label="Til / Язык">
-          <button type="button" data-lang-switch="uz" class="lang-flag-btn" title="O‘zbekcha" aria-label="O‘zbek tili" aria-pressed="true"><svg class="lang-flag-svg" viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="36" height="8" y="0" fill="#0099B5"/><rect width="36" height="8" y="8" fill="#FFFFFF"/><rect width="36" height="8" y="16" fill="#1EB53A"/><rect width="36" height="1.2" y="7.4" fill="#CE1126"/><rect width="36" height="1.2" y="15.4" fill="#CE1126"/><circle cx="7.2" cy="4" r="2.1" fill="none" stroke="#FFFFFF" stroke-width="0.85"/><circle cx="8.1" cy="4" r="1.65" fill="#0099B5"/><circle cx="11.8" cy="2.5" r="0.4" fill="#FFFFFF"/><circle cx="13.2" cy="3.4" r="0.38" fill="#FFFFFF"/><circle cx="12" cy="4.6" r="0.38" fill="#FFFFFF"/><circle cx="13.8" cy="5.1" r="0.35" fill="#FFFFFF"/></svg></button>
-          <button type="button" data-lang-switch="ru" class="lang-flag-btn" title="Русский" aria-label="Русский язык" aria-pressed="false"><svg class="lang-flag-svg" viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="36" height="8" y="0" fill="#FFFFFF"/><rect width="36" height="8" y="8" fill="#0039A6"/><rect width="36" height="8" y="16" fill="#D52B1E"/></svg></button>
-        </div>
+      <div id="lang-switcher" class="lang-switcher" role="group" aria-label="Til / Язык" data-i18n-skip="true"></div>
       <a href="../index.html#lead-top" class="btn-cta px-4 py-2.5 text-sm">Заявка</a>
     </div>
   </header>
