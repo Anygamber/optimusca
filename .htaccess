@@ -1,0 +1,158 @@
+# =============================================================================
+# Performance & caching — Apache / cPanel
+# Safe with IfModule guards (won't break if a module is missing).
+# Does NOT force HTTPS rewrites — leave SSL to cPanel AutoSSL / Let's Encrypt.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Gzip / Brotli-friendly Deflate (text assets)
+# -----------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  # Compress HTML, text, CSS, JS, JSON, SVG, XML, fonts (as text where applicable)
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/ld+json
+  AddOutputFilterByType DEFLATE application/manifest+json
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/atom+xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE font/ttf
+  AddOutputFilterByType DEFLATE font/otf
+  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+
+  # Legacy browsers (optional, harmless if unused)
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch ^Mozilla/4\.0[678] no-gzip
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+  # Ensure proxies don't serve wrong encoding
+  <IfModule mod_headers.c>
+    Header append Vary Accept-Encoding env=!dont-vary
+  </IfModule>
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# 2. Browser caching — Expires + Cache-Control
+# -----------------------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 week"
+
+  # Images — 1 year
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType image/vnd.microsoft.icon "access plus 1 year"
+
+  # Fonts — 1 year
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType font/otf "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+  ExpiresByType application/x-font-ttf "access plus 1 year"
+  ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+
+  # CSS / JS — 1 month
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/x-javascript "access plus 1 month"
+
+  # HTML — no long cache (updates visible immediately)
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/xhtml+xml "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Images — immutable long cache
+  <FilesMatch "\.(?i:webp|jpe?g|png|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Fonts — long cache + CORS-friendly for cross-origin webfonts
+  <FilesMatch "\.(?i:woff2|woff|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+
+  # CSS / JS — 1 month
+  <FilesMatch "\.(?i:css|js)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # HTML — revalidate every time
+  <FilesMatch "\.(?i:html?)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # JSON / XML data — short / no cache (catalog feeds, etc.)
+  <FilesMatch "\.(?i:json|xml)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+
+  # Do NOT force "Connection: keep-alive" here — it breaks HTTP/2 / some browsers
+  # and can surface as "Failed to fetch" on POST /webhook/*. KeepAlive is set in Apache.
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# MIME types (helps correct caching / compression on some hosts)
+# -----------------------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType image/svg+xml .svg .svgz
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType font/ttf .ttf
+  AddType application/javascript .js
+  AddType application/json .json
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Optional: ETag off for static fingerprinted assets (reduces conditional GETs)
+# Safe default for static sites; comment out if you rely on ETags elsewhere.
+# -----------------------------------------------------------------------------
+<IfModule mod_headers.c>
+  <FilesMatch "\.(?i:webp|jpe?g|png|gif|svg|ico|woff2|woff|ttf|css|js)$">
+    Header unset ETag
+  </FilesMatch>
+</IfModule>
+FileETag None
+
+# -----------------------------------------------------------------------------
+# Security: block access to hidden / sensitive files (does not affect SSL)
+# -----------------------------------------------------------------------------
+<IfModule mod_authz_core.c>
+  <FilesMatch "(?i)^\.(env|git|htaccess|htpasswd)">
+    Require all denied
+  </FilesMatch>
+  <FilesMatch "(?i)^(package(-lock)?\.json|composer\.(json|lock))$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# OPTIONAL HTTPS redirect (DISABLED by default — enable only if cPanel
+# does not already force HTTPS via "Force HTTPS Redirect").
+# Uncomment the block below if needed:
+#
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+# -----------------------------------------------------------------------------

@@ -1,0 +1,13 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tikkurila & Dekoral distributor landing",
+  "scripts": {
+    "webp": "node scripts/convert-to-webp.js",
+    "notify": "python scripts/notify_done.py"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.4"
+  }
+}

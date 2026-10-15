@@ -1,0 +1,40 @@
+# Secrets / local env
+.env
+.env.*
+!.env.example
+app/.env
+
+# Python
+*.pyc
+__pycache__/
+.DS_Store
+
+# Node
+node_modules/
+
+# Google Ads service account key
+google_key.json
+**/google_key.json
+
+# B2B Portfolio SQLite
+app/data/portfolio.db
+**/portfolio.db
+
+# Heavy archives / local deploy dumps (do not push to GitHub)
+*.zip
+*.ZIP
+Deploy*/
+Деплой*/
+deploy_lead_telegram_fix*/
+Файлы деплоя*/
+
+# Logs / OS
+logs/
+*.log
+Thumbs.db
+
+# Editor / Cursor / backups
+.cursor/
+*.bak
+*.bak-*
+index.html.bak*

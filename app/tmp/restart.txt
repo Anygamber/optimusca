@@ -1,0 +1,4 @@
+# Touch or rewrite this file after deploy to force Passenger restart:
+#   touch tmp/restart.txt
+# Or in cPanel File Manager: edit & save this file.
+restart_requested=v2_google_ads_active
