@@ -1,0 +1,44 @@
+# Local / OS junk
+.git/
+.github/
+.cursor/
+.env
+.env.*
+!.env.example
+*.log
+logs/
+Thumbs.db
+.DS_Store
+__pycache__/
+*.pyc
+*.bak
+*.bak-*
+index.html.bak*
+
+# Dependencies & tooling
+node_modules/
+package-lock.json
+scripts/
+.gitattributes
+.git-ftp-ignore
+.gitignore
+web-design-skill.md
+
+# Secrets / keys
+google_key.json
+**/google_key.json
+app/data/portfolio.db
+**/portfolio.db
+
+# Heavy archives & local deploy dumps (never upload)
+*.zip
+*.ZIP
+Deploy*/
+Деплой*/
+deploy_lead_telegram_fix*/
+Файлы деплоя*/
+deploy_lead_telegram_fix.zip
+
+# Local Python caches / temp
+app/tmp/
+*.tmp

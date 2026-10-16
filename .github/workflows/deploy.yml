@@ -19,4 +19,32 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_PATH }}
+          # SamKirkland requires a trailing slash (e.g. public_html/)
+          server-dir: ${{ endsWith(secrets.FTP_SERVER_PATH, '/') && secrets.FTP_SERVER_PATH || format('{0}/', secrets.FTP_SERVER_PATH) }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/.cursor/**
+            **/.env
+            **/.env.*
+            **/node_modules/**
+            **/__pycache__/**
+            **/logs/**
+            **/*.log
+            **/*.bak
+            **/*.bak-*
+            **/index.html.bak*
+            **/*.zip
+            **/Deploy*/**
+            **/Деплой*/**
+            **/deploy_lead_telegram_fix*/**
+            **/Файлы деплоя*/**
+            **/scripts/**
+            **/google_key.json
+            **/portfolio.db
+            **/.ftp-deploy-sync-state.json
+            **/web-design-skill.md
+            **/.gitattributes
+            **/.git-ftp-ignore
+            **/.gitignore

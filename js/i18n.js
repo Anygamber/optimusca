@@ -41,16 +41,18 @@
 
   var SWITCHER_HTML =
     '<button type="button" class="lang-dd-toggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Til / Язык">' +
-      '<span class="lang-dd-flag" data-lang-current-flag>' + FLAG_UZ + '</span>' +
+      '<span class="lang-dd-flag" data-lang-current-flag aria-hidden="true">' + FLAG_UZ + '</span>' +
       '<span class="lang-dd-code" data-lang-current-code>UZ</span>' +
       CHEVRON +
     '</button>' +
     '<div class="lang-dd-menu" role="listbox" hidden>' +
       '<button type="button" role="option" data-lang-switch="uz" class="lang-dd-option" title="O‘zbekcha" aria-label="O‘zbek tili">' +
-        FLAG_UZ + '<span>O‘zbekcha</span>' +
+        '<span class="lang-dd-flag" aria-hidden="true">' + FLAG_UZ + '</span>' +
+        '<span class="lang-dd-label">O‘zbekcha</span>' +
       '</button>' +
       '<button type="button" role="option" data-lang-switch="ru" class="lang-dd-option" title="Русский" aria-label="Русский язык">' +
-        FLAG_RU + '<span>Русский</span>' +
+        '<span class="lang-dd-flag" aria-hidden="true">' + FLAG_RU + '</span>' +
+        '<span class="lang-dd-label">Русский</span>' +
       '</button>' +
     '</div>';
 

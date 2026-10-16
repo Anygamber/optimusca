@@ -28,10 +28,15 @@ Deploy*/
 deploy_lead_telegram_fix*/
 Файлы деплоя*/
 
-# Logs / OS
+# FTP sync state (SamKirkland)
+.ftp-deploy-sync-state.json
+
+# Logs / OS / temp
 logs/
 *.log
+*.tmp
 Thumbs.db
+app/tmp/
 
 # Editor / Cursor / backups
 .cursor/
