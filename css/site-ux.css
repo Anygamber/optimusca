@@ -1,13 +1,46 @@
 /* Optimus CA — UX / a11y / Google Page Experience helpers */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   --touch-min: 44px;
   --flag-w: 28px;
   --flag-h: 18px;
   --focus-ring: 0 0 0 3px rgba(220, 38, 38, 0.28);
+  --font-sans: 'Inter', sans-serif;
 }
 
 #site-bg-overlay { opacity: 0.28; }
+
+/* Global Inter typography — inherit site-wide */
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+}
+
+button,
+input,
+select,
+textarea,
+optgroup,
+.btn-cta,
+a.btn-cta,
+#site-header,
+#site-header a,
+#site-header button,
+#mobile-nav,
+#mobile-nav a,
+.lang-dd-toggle,
+.lang-dd-option,
+.lang-dd-code,
+.lang-dd-label {
+  font-family: inherit;
+}
 
 /* Skip link removed — never show leftover a11y strip at top */
 .skip-link,
