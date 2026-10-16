@@ -186,7 +186,7 @@
   </script>
 
 
-  <link rel="stylesheet" href="/css/site-ux.css?v=20261016_langfix">
+  <link rel="stylesheet" href="/css/site-ux.css?v=20261016_fix_final">
   <link rel="preload" as="image" href="/images/hero-banner.webp" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -748,31 +748,31 @@
 
   <!-- Header -->
   <header id="site-header" class="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-lg">
-    <div class="header-bar mx-auto flex w-full max-w-7xl flex-nowrap items-center justify-between gap-3 px-4 py-3.5">
-      <div class="header-brand flex shrink-0 items-center">
-        <a href="/" class="group min-w-0" aria-label="На главную">
+    <div class="header-bar mx-auto w-full max-w-7xl px-4 py-3.5">
+      <div class="header-brand">
+        <a href="/" class="group" aria-label="На главную">
           <span class="text-base font-semibold tracking-tight text-zinc-900 sm:text-lg">
             Tikkurila <span class="text-red-600">&amp;</span> Dekoral
           </span>
           <span class="hidden text-xs font-medium text-zinc-500 sm:block">Официальный дистрибьютор · Ташкент</span>
         </a>
       </div>
-      <nav aria-label="Основная навигация" class="header-nav hidden min-w-0 flex-1 justify-center lg:flex">
-        <ul class="flex flex-nowrap items-center justify-center gap-1 text-sm font-semibold text-zinc-600 xl:gap-2">
-          <li><a href="#products" class="whitespace-nowrap transition-colors hover:text-red-600">Каталог</a></li>
-          <li><a href="#calculator" class="whitespace-nowrap transition-colors hover:text-red-600">Калькулятор</a></li>
-          <li><a href="b2b.html" class="whitespace-nowrap transition-colors hover:text-red-600">Для бизнеса</a></li>
-          <li><a href="blog.html" class="whitespace-nowrap transition-colors hover:text-red-600">Блог</a></li>
-          <li><a href="faq.html" class="whitespace-nowrap transition-colors hover:text-red-600">FAQ</a></li>
-          <li><a href="#contacts" class="whitespace-nowrap transition-colors hover:text-red-600">Филиалы</a></li>
+      <nav aria-label="Основная навигация" class="header-nav hidden lg:flex">
+        <ul class="nav-list text-sm font-semibold text-zinc-600">
+          <li><a href="#products" class="transition-colors hover:text-red-600">Каталог</a></li>
+          <li><a href="#calculator" class="transition-colors hover:text-red-600">Калькулятор</a></li>
+          <li><a href="b2b.html" class="transition-colors hover:text-red-600">Для бизнеса</a></li>
+          <li><a href="blog.html" class="transition-colors hover:text-red-600">Блог</a></li>
+          <li><a href="faq.html" class="transition-colors hover:text-red-600">FAQ</a></li>
+          <li><a href="#contacts" class="transition-colors hover:text-red-600">Филиалы</a></li>
         </ul>
       </nav>
-      <div class="header-actions flex shrink-0 items-center gap-2 sm:gap-3">
+      <div class="header-actions">
         <button type="button" id="nav-toggle" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menyu / Меню">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <div id="lang-switcher" class="lang-switcher" role="group" aria-label="Til / Язык" data-i18n-skip="true"></div>
-        <a href="tel:+998555007997" data-dl-event="click_phone" class="header-phone hidden text-sm font-bold text-zinc-900 transition-colors hover:text-red-600 2xl:inline">
+        <a href="tel:+998555007997" data-dl-event="click_phone" class="header-phone text-sm font-bold text-zinc-900 transition-colors hover:text-red-600">
           +998 55 500 79 97
         </a>
         <a
