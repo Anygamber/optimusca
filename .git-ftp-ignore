@@ -1,3 +1,10 @@
+# NOTE: SamKirkland/ftp-deploy-action uses workflow `exclude:`, not this file.
+# This list is for git-ftp CLI / documentation only.
+#
+# DO NOT ignore site assets:
+#   css/  js/  images/  locales/  app/  articles/  data/
+#   *.html  *.css  *.js  sitemap.xml  robots.txt  .htaccess
+
 # Local / OS junk
 .git/
 .github/

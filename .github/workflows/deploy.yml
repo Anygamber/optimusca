@@ -19,8 +19,16 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # SamKirkland requires a trailing slash (e.g. public_html/)
+          # Must end with / (e.g. public_html/)
           server-dir: ${{ endsWith(secrets.FTP_SERVER_PATH, '/') && secrets.FTP_SERVER_PATH || format('{0}/', secrets.FTP_SERVER_PATH) }}
+          # Do NOT wipe the whole server folder
+          dangerous-clean-slate: false
+          # New state file forces a full re-compare/upload after manual cPanel edits
+          # (old .ftp-deploy-sync-state.json may be stale vs live files)
+          state-name: .ftp-deploy-sync-state.v2.json
+          log-level: verbose
+          # IMPORTANT: do NOT exclude css/, js/, images/, locales/, app/, *.html
+          # Only tooling / secrets / local dumps. Keep default .git* excludes.
           exclude: |
             **/.git*
             **/.git*/**
@@ -43,7 +51,6 @@ jobs:
             **/scripts/**
             **/google_key.json
             **/portfolio.db
-            **/.ftp-deploy-sync-state.json
             **/web-design-skill.md
             **/.gitattributes
             **/.git-ftp-ignore

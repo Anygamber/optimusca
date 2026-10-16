@@ -360,3 +360,5 @@ summary:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
+
+/* FTP deploy probe 2026-10-16 — safe to keep; verifies ftp-deploy-action overwrites CSS */
