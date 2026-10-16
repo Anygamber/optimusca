@@ -92,7 +92,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="/css/site-ux.css?v=20261016_logo_glitch">
+  <link rel="stylesheet" href="/css/site-ux.css?v=20261016_inter">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -281,16 +281,14 @@
 
   <header id="site-header" class="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-lg">
     <div class="header-bar mx-auto flex w-full max-w-6xl flex-nowrap items-center justify-between gap-3 px-4 py-3.5">
-      <div class="header-brand">
-        <a href="index.html" class="site-logo-link" aria-label="OPTIMUS CA — На главную">
-          <span class="site-logo site-logo--glitch" data-logo-glitch>
-            <img class="site-logo__img site-logo__img--base" src="/images/e06e4b868b4d820b62bf8ceaa3a4e498.jpg" width="1000" height="1000" alt="OPTIMUSCA" decoding="async">
-            <img class="site-logo__img site-logo__img--r" src="/images/e06e4b868b4d820b62bf8ceaa3a4e498.jpg" width="1000" height="1000" alt="" aria-hidden="true" decoding="async">
-            <img class="site-logo__img site-logo__img--c" src="/images/e06e4b868b4d820b62bf8ceaa3a4e498.jpg" width="1000" height="1000" alt="" aria-hidden="true" decoding="async">
-          </span>
-        </a>
+      <div class="header-brand flex shrink-0 items-center gap-3">
+      <a href="index.html" class="group inline-flex items-center gap-2 text-sm font-bold text-zinc-900 transition-colors hover:text-red-600" aria-label="На главную">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-600 transition-transform group-hover:-translate-x-0.5" aria-hidden="true">←</span>
+        На главную
+      </a>
       </div>
       <nav class="header-nav hidden min-w-0 flex-1 items-center justify-center gap-3 text-sm font-semibold text-zinc-600 sm:flex" aria-label="Навигация">
+        <a href="index.html" class="text-lg font-semibold tracking-tight text-zinc-900">Tikkurila <span class="text-red-600">&amp;</span> Dekoral</a>
         <a href="blog.html" class="transition-colors hover:text-red-600">Блог</a>
         <a href="#catalog" class="transition-colors hover:text-red-600">Каталог TDS</a>
         <a href="faq.html" class="transition-colors hover:text-red-600">FAQ</a>
@@ -641,8 +639,5 @@
       }
     });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <script src="/js/site-motion.js?v=20261016_logo_glitch" defer></script>
 </body>
 </html>

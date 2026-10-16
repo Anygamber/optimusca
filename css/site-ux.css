@@ -107,78 +107,6 @@ a.skip-link {
   min-width: max-content;
 }
 
-/* Site logo + Subtle Glitch (transform-only RGB split) */
-.site-logo-link {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-  line-height: 0;
-}
-
-.site-logo {
-  position: relative;
-  display: inline-block;
-  width: auto;
-  height: 2.5rem;
-  overflow: hidden;
-  isolation: isolate;
-  flex-shrink: 0;
-}
-
-@media (min-width: 640px) {
-  .site-logo {
-    height: 2.75rem;
-  }
-}
-
-.site-logo__img {
-  display: block;
-  height: 100%;
-  width: auto;
-  max-width: 9.5rem;
-  object-fit: contain;
-  object-position: left center;
-  user-select: none;
-  pointer-events: none;
-}
-
-.site-logo__img--base {
-  position: relative;
-  z-index: 2;
-}
-
-.site-logo__img--r,
-.site-logo__img--c {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  will-change: transform, opacity;
-  mix-blend-mode: screen;
-}
-
-.site-logo__img--r {
-  filter: contrast(1.15) sepia(1) saturate(12) hue-rotate(-15deg) brightness(1.05);
-}
-
-.site-logo__img--c {
-  filter: contrast(1.1) sepia(1) saturate(10) hue-rotate(155deg) brightness(1.05);
-}
-
-.site-logo.is-stable .site-logo__img--r,
-.site-logo.is-stable .site-logo__img--c {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-logo__img--r,
-  .site-logo__img--c {
-    display: none !important;
-  }
-}
-
 #site-header .header-nav {
   flex: 0 0 auto;
   align-items: center;
@@ -496,27 +424,6 @@ input:focus-visible,
 summary:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
-}
-
-/* GSAP motion: will-change only on hero entrance targets (gsap-performance) */
-#hero .badge-row,
-#hero-title,
-#hero .hero-lead,
-#hero .btn-equal,
-#hero .hero-banner,
-#hero .hero-form-card {
-  will-change: transform, opacity;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #hero .badge-row,
-  #hero-title,
-  #hero .hero-lead,
-  #hero .btn-equal,
-  #hero .hero-banner,
-  #hero .hero-form-card {
-    will-change: auto;
-  }
 }
 
 /* FTP deploy probe 2026-10-16 — safe to keep; verifies ftp-deploy-action overwrites CSS */
