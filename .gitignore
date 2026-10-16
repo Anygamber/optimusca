@@ -4,6 +4,11 @@
 !.env.example
 app/.env
 
+# Heavy media / local assets (keep on disk, not in git)
+Products/
+tds/
+home/
+
 # Python
 *.pyc
 __pycache__/
