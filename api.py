@@ -3,10 +3,11 @@ CRM lead intake + Round-Robin distribution for Tikkurila website.
 
 Firebase RTDB layout:
   /incoming_leads/{leadId}           — общий банк заявок (статус «Новый лид»)
-  /deals/{leadId}                    — сделка в B2B-канбане (колонка «Новый лид» / cold)
-  /partner_leads/{partnerId}/{id}    — копия в разделе назначенного посредника
+  /partner_leads/{partnerId}/{id}    — копия в разделе назначенного посредника (фермеры)
   /lead_distribution/partners/{id}   — очередь посредников (фермеры/дилеры)
   /lead_distribution/cursor          — индекс Round-Robin
+
+Site leads are NOT written to /deals (B2B hunter kanban) to avoid duplicates.
 """
 
 from __future__ import annotations
@@ -903,13 +904,19 @@ async def save_lead_to_bank(
 async def save_lead_to_deals(
     client: httpx.AsyncClient,
     lead_payload: Mapping[str, Any],
-) -> str:
-    """Mirror into /deals so the card appears in CRM B2B kanban."""
-    lead_id = str(lead_payload["id"])
-    _log_crm("Writing DEAL deals/%s …", lead_id)
-    await _fb_put(client, f"deals/{lead_id}", dict(lead_payload))
-    _log_crm("DEAL write OK deals/%s", lead_id)
-    return lead_id
+) -> Optional[str]:
+    """
+    Legacy: previously mirrored website leads into /deals (B2B kanban).
+
+    Disabled — site leads belong only in incoming_leads / partner_leads (farmers).
+    Kept as a no-op so older callers do not create B2B duplicates.
+    """
+    lead_id = str(lead_payload.get("id") or "")
+    _log_crm(
+        "SKIP deals/%s — website leads are not mirrored to B2B kanban",
+        lead_id or "?",
+    )
+    return None
 
 
 async def save_lead_to_partner_section(
@@ -1489,10 +1496,10 @@ async def distribute_website_lead(lead: Mapping[str, Any]) -> dict[str, Any]:
     """
     Full pipeline for POST /webhook/lead:
       1) pick partner (Round-Robin)
-      2) build standard lead template (column «Новый лид»)
+      2) build standard lead template
       3) save to bank /incoming_leads  (critical)
-      4) save to /deals                (best-effort)
-      5) duplicate to /partner_leads   (critical)
+      4) duplicate to /partner_leads   (critical)
+      — NOT written to /deals (B2B kanban) — farmers handle site leads only.
 
     Never raises to the caller — returns {ok, lead_id, partner, error?}.
     """
@@ -1549,13 +1556,9 @@ async def distribute_website_lead(lead: Mapping[str, Any]) -> dict[str, Any]:
             # Partner copy — critical for farmer UI
             await save_lead_to_partner_section(client, partner, payload)
 
-            # Deals mirror — non-fatal
-            try:
-                await save_lead_to_deals(client, payload)
-                result["deal_path"] = f"deals/{lead_id}"
-            except Exception as deal_exc:
-                result["errors"].append(f"deals: {deal_exc}")
-                _log_crm("DEAL write failed (non-fatal): %s", deal_exc, level=logging.ERROR)
+            # Do NOT mirror into /deals — avoids B2B kanban duplicates for site leads
+            await save_lead_to_deals(client, payload)  # no-op by design
+            result["deal_path"] = None
 
             safe_partner = _fb_safe_key(str(partner.get("id") or ""))
             result.update(

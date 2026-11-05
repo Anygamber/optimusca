@@ -124,11 +124,7 @@ except ImportError as _imp_exc:  # pragma: no cover
     async def push_google_ads_conversion(**_kwargs: Any) -> dict[str, Any]:  # type: ignore[misc]
         return {"ok": False, "error": f"api.py not found: {_crm_import_error}"}
 
-# Fallback credentials (overridden by .env when set). Used so a stale host .env
-# with a revoked token does not silently disable Telegram notify.
-_DEFAULT_TELEGRAM_BOT_TOKEN = "8972524669:AAGiDzqqkXOAFCB875CwZsPHOgg8nWbyOS0"
-_DEFAULT_TELEGRAM_CHAT_ID = "8678902051"
-
+# Telegram credentials: ONLY from environment / .env (never hardcode tokens).
 _PLACEHOLDER_VALUES = {
     "",
     "ваш_токен_бота",
@@ -146,13 +142,13 @@ def _clean_secret(value: str) -> str:
     return v
 
 
-TELEGRAM_BOT_TOKEN = (
-    _clean_secret(os.getenv("TELEGRAM_BOT_TOKEN", "")) or _DEFAULT_TELEGRAM_BOT_TOKEN
-)
-TELEGRAM_CHAT_ID = (
-    _clean_secret(os.getenv("TELEGRAM_CHAT_ID", "")) or _DEFAULT_TELEGRAM_CHAT_ID
-)
+TELEGRAM_BOT_TOKEN = _clean_secret(os.getenv("TELEGRAM_BOT_TOKEN", ""))
+TELEGRAM_CHAT_ID = _clean_secret(os.getenv("TELEGRAM_CHAT_ID", ""))
 TELEGRAM_HTTP_TIMEOUT = 3.0
+
+# Dedup: same phone within window → skip second Telegram send
+_TG_RECENT: dict[str, float] = {}
+_TG_DEDUP_WINDOW_SEC = 90.0
 
 
 def telegram_configured() -> bool:
@@ -322,6 +318,26 @@ def format_lead_telegram_message(
     )
 
 
+def _telegram_dedup_skip(text: str) -> bool:
+    """Skip duplicate notify for same phone within a short window."""
+    import hashlib
+    import re
+    import time
+
+    digits = "".join(re.findall(r"\d+", text or ""))
+    # Prefer last 9–12 digits as phone fingerprint; fall back to text hash
+    phone_fp = digits[-12:] if len(digits) >= 9 else hashlib.sha1((text or "").encode("utf-8")).hexdigest()[:16]
+    now = time.time()
+    stale = [k for k, ts in _TG_RECENT.items() if now - ts > _TG_DEDUP_WINDOW_SEC]
+    for k in stale:
+        _TG_RECENT.pop(k, None)
+    prev = _TG_RECENT.get(phone_fp)
+    if prev is not None and (now - prev) < _TG_DEDUP_WINDOW_SEC:
+        return True
+    _TG_RECENT[phone_fp] = now
+    return False
+
+
 async def telegram_send_message(text: str) -> dict[str, Any]:
     """
     Autonomous Telegram notify. Never raises — never affects HTTP status.
@@ -331,6 +347,12 @@ async def telegram_send_message(text: str) -> dict[str, Any]:
     if not telegram_configured():
         result["error"] = "telegram_not_configured"
         log.warning("Telegram not configured — background notify skipped")
+        return result
+
+    if _telegram_dedup_skip(text):
+        result["ok"] = True
+        result["error"] = "dedup_skip"
+        log.info("Telegram notify skipped (dedup within %ss)", int(_TG_DEDUP_WINDOW_SEC))
         return result
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -453,6 +475,24 @@ def _register_routes(app: FastAPI) -> None:
             ads_status = ads_config_status()
         except Exception as exc:  # noqa: BLE001
             ads_status = {"configured": False, "reason": f"import_error:{exc}"}
+        portfolio_status: dict[str, Any] = {"mounted": False, "db": None, "error": None}
+        try:
+            from portfolio import init_portfolio_db, _db_path
+
+            db_path = init_portfolio_db()
+            portfolio_status = {
+                "mounted": True,
+                "db": str(db_path),
+                "exists": db_path.is_file(),
+                "error": None,
+            }
+        except Exception as portfolio_exc:  # noqa: BLE001
+            portfolio_status = {
+                "mounted": False,
+                "db": None,
+                "exists": False,
+                "error": str(portfolio_exc),
+            }
         return {
             "ok": True,
             "version": "v2_google_ads_active",
@@ -463,6 +503,7 @@ def _register_routes(app: FastAPI) -> None:
             "site_root": str(ROOT),
             "ads_configured": bool(ads_status.get("configured")),
             "ads": ads_status,
+            "portfolio": portfolio_status,
             "env_files": [str(p) for p in _env_loaded],
             "server_file": __file__,
         }
