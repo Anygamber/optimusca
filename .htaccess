@@ -120,6 +120,18 @@
   AddType font/ttf .ttf
   AddType application/javascript .js
   AddType application/json .json
+  AddType text/plain .txt
+  AddType application/xml .xml
+</IfModule>
+
+# Ensure robots.txt is always publicly readable (Ahrefs / crawlers)
+<IfModule mod_authz_core.c>
+  <Files "robots.txt">
+    Require all granted
+  </Files>
+  <Files "sitemap.xml">
+    Require all granted
+  </Files>
 </IfModule>
 
 # -----------------------------------------------------------------------------

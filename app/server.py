@@ -831,6 +831,24 @@ def _register_routes(app: FastAPI) -> None:
             "crm_error": crm.get("error"),
         }
 
+
+    # explicit_seo_files_robots_sitemap
+    @app.get("/robots.txt", include_in_schema=False)
+    async def robots_txt():
+        path = ROOT / "robots.txt"
+        if not path.is_file():
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="robots.txt missing")
+        return FileResponse(path, media_type="text/plain; charset=utf-8")
+
+    @app.get("/sitemap.xml", include_in_schema=False)
+    async def sitemap_xml():
+        path = ROOT / "sitemap.xml"
+        if not path.is_file():
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="sitemap.xml missing")
+        return FileResponse(path, media_type="application/xml")
+
     index_path = ROOT / "index.html"
     if index_path.is_file():
         @app.get("/")
