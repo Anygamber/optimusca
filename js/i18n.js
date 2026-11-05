@@ -295,6 +295,35 @@
       });
   }
 
+  /** Absolute page URL for a language — must match hreflang / canonical cluster. */
+  function absoluteLangUrl(lang) {
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set('lang', lang || DEFAULT_LANG);
+      url.hash = '';
+      return url.toString();
+    } catch (e) {
+      return window.location.href;
+    }
+  }
+
+  /**
+   * Keep canonical + og:url equal to the active language URL (self-reference).
+   * Hreflang cluster stays static in HTML with unique uz/ru URLs.
+   */
+  function syncSeoForLang(lang) {
+    if (!SUPPORTED[lang]) lang = DEFAULT_LANG;
+    var selfUrl = absoluteLangUrl(lang);
+    var link = document.querySelector('link[rel="canonical"]');
+    if (link) link.setAttribute('href', selfUrl);
+    var og = document.querySelector('meta[property="og:url"]');
+    if (og) og.setAttribute('content', selfUrl);
+    try {
+      document.documentElement.lang = lang === 'uz' ? 'uz' : 'ru';
+      document.documentElement.setAttribute('data-lang', lang);
+    } catch (e2) { /* ignore */ }
+  }
+
   function setLanguage(lang, opts) {
     opts = opts || {};
     if (!SUPPORTED[lang]) lang = DEFAULT_LANG;
@@ -313,9 +342,12 @@
       return Promise.resolve(null);
     }
 
+    syncSeoForLang(lang);
+
     return loadDict(lang)
       .then(function (dict) {
         apply(dict);
+        syncSeoForLang(lang);
         return dict;
       })
       .catch(function (err) {
