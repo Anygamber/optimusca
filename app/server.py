@@ -506,6 +506,7 @@ def _register_routes(app: FastAPI) -> None:
             "portfolio": portfolio_status,
             "env_files": [str(p) for p in _env_loaded],
             "server_file": __file__,
+            "note": "CRM Agents API for Grok lives in build-crm/crm_api (port 8020), not on this website app",
         }
 
     @app.get("/debug-version")
